@@ -1,0 +1,106 @@
+# YAML es alternativa a XML | JSON
+# Podemos poner comentarios. 
+---
+# En un fichero YAML puedo tener muchos documentos YAML
+# Cada documento empieza por ---, menos el primero
+---
+# Un documento es UN nodo
+# Y hay 2 tipos de nodos: ESCALARES / DE COLECCION
+---
+# Escalares: Valore sencillos: Textos, números, booleanos
+---
+# Números
+3
+---
+3.45
+-7.78
+---
+# Booleanos:
+true # TRUE True
+---
+false # FALSE False
+---
+# Textos
+Esto "es un 'Texto que tiene muchas #palabras
+---
+"Esto \"es un 'Texto que tiene muchas #palabras"
+---
+'Esto "es un ''Texto que tiene muchas #palabras'
+---
+# 2 sintaxis adicionales: TExtos de varias lineas
+---
+# Literal:
+|
+                Escribo el texto que me de la real gana
+                Con muchas lineas
+
+                Y más lineas y caracteres raros: #"':"
+---
+# Folded
+>
+ docker container create
+    --name minginx
+    -p 8080:80
+    -e variale1=valor
+    -e variale1=valor
+    -e variale1=valor
+    -e variale1=valor
+    -v /ruta/local/esta:/ruta/en/contenedor
+    -v /ruta/local/esta:/ruta/en/contenedor
+    -v /ruta/local/esta:/ruta/en/contenedor
+    nginx:latest
+    comando
+    # Esto se aplana a una linea, reemplazando los saltos de linea por espacios en blanco
+
+---
+
+# Collecciones:
+
+# Mapas desordenados
+clave1: valor1
+clave2: 33
+clave3: true
+clave4: 
+  - item1
+  - item2
+clave5:
+  subclave1: valor1
+  subclave2: valor2
+---
+# Listas ordenadas
+
+- item1
+- "hola"
+- 33
+- true
+- # Otra lista (una sublista)
+  - Subitem 1
+  - 2
+
+---
+
+usuario:
+  nombre:       Ivan
+  apellidos:
+              - Osuna
+              - Ayuste
+  edad:         47
+
+---
+# CAda programa que usa yaml define su propio ESQUEMA de datos.
+
+---
+
+kind:       Pod
+apiVersion: v1
+
+metadata:
+  name:     mi-pod
+
+spec:
+  containers:
+    - name: minginx
+      image: nginx:latest
+      ports:
+        - port: 80
+          protocol: tcp
