@@ -1,0 +1,135 @@
+kubectl --configfile .\kubeconfig-remoto.yaml get nodes
+.\kubectl --configfile .\kubeconfig-remoto.yaml get nodes
+.\kubectl.exe --configfile .\kubeconfig-remoto.yaml get nodes
+ls
+.\oc --configfile .\kubeconfig-remoto.yaml get nodes
+.\oc --kubeconfig .\kubeconfig-remoto.yaml get nodes
+clear
+git init
+git add :/
+git remoteadd origin https://github.com/IvanciniGT/formacionContenedores.git
+rmdir .git
+rmdir -r .git
+git add :/
+git init
+git add :/
+git commit -m 'dia2'
+git push
+git push -u origin main
+git push -u origin master
+git remote add origin https://github.com/IvanciniGT/formacionContenedores.git
+git push -u origin master
+.\oc.exe version --client
+oc
+.\oc.exe get nodes
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get nodes
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get namespace
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n entorno-formacion
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec entorno-formacion-11 -it -n entorno-formacion -- bash
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get node
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get nodes
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get namespaces
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get namespace
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ns
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -m openclaw
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n openclaw
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n loki
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get opensearch -n opensearch
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get opensearchclusters.opensearch.org -n opensearch
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get opensearchclusters.opensearch.org -n opensearch -o yaml
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\ejemplos\0-namespace.yaml
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ns
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\ejemplos\1-pod.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pod -n curso-ivan
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe pod pod-ivan  -n curso-ivan
+cñear
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it  pod-ivan -c minginx -n curso-ivan -- bash
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe pod pod-ivan  -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods  -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it  pod-ivan -c minginx -n curso-ivan -- bash
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete -f .\ejemplos\1-pod.yaml -n curso-ivan
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\ejemplos\2-deployment.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml gt pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete pod deployment-ivan-84df74d68f-hkbh7 -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml scale deployment deployment-ivan --replicas 10 -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml gt pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml scale deployment deployment-ivan --replicas 3 -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+base64
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get deployment -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods 
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete deployment deployment-mariadb
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods 
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete pod mariadb-6c8c7c7cfd-8xkbz -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete pod deployment-mariadb-7bdd4b447c-kb4p6 -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get service -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe service servicio-mariadb -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe service servicio-mariadb -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete pod deployment-mariadb-7bdd4b447c-945bm -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe service servicio-mariadb -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml delete -f .\wodpress.yaml
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+ping 47.62.130.49
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get service -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe  service servicio-wordpress -n curso-ivan -o wide
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe  service servicio-wordpress -n curso-ivan 
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan -o wide
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ns
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get service -n ingress-public
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get service -n ingress-private
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get service -n ingress-internal
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n ingress-internal
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n ingress-public
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ingressclass
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+clear
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ingress -n curso-ivan
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ingress -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ingress-class
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get ingressclass
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+clear
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it deployment-prueba-volumenes-df9ff7f87-2mh98 -c contenedor-1 -n curso-ivan -- bash
+ .\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it deployment-prueba-volumenes-df9ff7f87-2mh98 -c contenedor-2 -n curso-ivan -- bash
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe deployment-prueba-volumenes-7b7bd87d4b-cs7gp -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml describe pod deployment-prueba-volumenes-7b7bd87d4b-cs7gp -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml apply -f .\wodpress.yaml -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml get pods -n curso-ivan
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it deployment-prueba-volumenes-6fb5997658-8tgw8 -c contenedor-1 -n curso-ivan -- bash
+.\oc.exe --kubeconfig .\kubeconfig-remoto.yaml exec -it deployment-prueba-volumenes-6fb5997658-8tgw8 -c contenedor-2 -n curso-ivan -- bash
+history
