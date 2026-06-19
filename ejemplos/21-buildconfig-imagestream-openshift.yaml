@@ -1,0 +1,52 @@
+# ============================================================================
+#  IMAGESTREAM + BUILDCONFIG (OpenShift)  —  Construir imágenes en el clúster
+# ----------------------------------------------------------------------------
+#  EXCLUSIVO DE OPENSHIFT. Permite construir una imagen a partir del CÓDIGO
+#  FUENTE, dentro del propio clúster, sin necesidad de un Dockerfile (S2I).
+#
+#   - ImageStream : referencia y versiona la imagen resultante dentro de OpenShift.
+#   - BuildConfig : define CÓMO construir (origen del código, estrategia S2I,
+#                   imagen constructora) y a dónde publicar el resultado.
+#                   Cada ejecución genera un objeto Build.
+#
+#  Aplicar:    oc apply -f 21-buildconfig-imagestream-openshift.yaml
+#  Lanzar una construcción:   oc start-build mi-app
+#  Ver builds:                oc get builds && oc logs build/mi-app-1
+#  Atajo equivalente a todo esto:
+#      oc new-app https://github.com/usuario/mi-app --name=mi-app
+# ============================================================================
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: mi-app                     # aquí se publicarán las imágenes construidas
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: mi-app
+
+spec:
+  source:                          # ----- DE DÓNDE sale el código -----
+    type: Git
+    git:
+      uri: https://github.com/IvanciniGT/webEjemploAnsible
+      ref: main
+
+  strategy:                        # ----- CÓMO se construye (S2I) -----
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift       # catálogo de imágenes constructoras de OpenShift
+        name: "nginx:latest"       # imagen constructora (builder image)
+
+  output:                          # ----- A DÓNDE va la imagen resultante -----
+    to:
+      kind: ImageStreamTag
+      name: "mi-app:latest"        # publica en el ImageStream de arriba
+
+  triggers:                        # ----- CUÁNDO se dispara una construcción ---
+    - type: ConfigChange           # al cambiar este BuildConfig
+    - type: GitHub                 # (opcional) por webhook al hacer push
+      github:
+        secret: un-secreto-webhook

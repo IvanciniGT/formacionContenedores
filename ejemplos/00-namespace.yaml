@@ -1,0 +1,18 @@
+# ============================================================================
+#  NAMESPACE  —  Agrupación lógica de objetos dentro del clúster
+# ----------------------------------------------------------------------------
+#  Crea un "espacio de nombres" donde los nombres de los objetos deben ser
+#  ÚNICOS. Se usa para: agrupar los recursos de una aplicación, separar
+#  entornos (desarrollo / producción) y aplicar permisos y cuotas por entorno.
+#
+#  Aplicar:    kubectl apply -f 00-namespace.yaml
+#  Consultar:  kubectl get namespaces
+#  En OpenShift el concepto equivalente es el "Project" (oc new-project ...).
+# ============================================================================
+kind: Namespace
+apiVersion: v1                 # los objetos "core" usan apiVersion v1
+
+metadata:
+  name: formacion              # identificador del Namespace (único en el clúster)
+  labels:
+    entorno: laboratorio       # las etiquetas son libres; útiles para selección

@@ -1,0 +1,85 @@
+# ============================================================================
+#  STATEFULSET  —  Plantilla de Pod + plantilla de PVC + nº de réplicas
+# ----------------------------------------------------------------------------
+#  Como un Deployment, pero CADA réplica recibe:
+#   - su PROPIO volumen persistente (a través de volumeClaimTemplates), y
+#   - una IDENTIDAD estable: los Pods se llaman mariadb-0, mariadb-1, ...
+#  Caso típico: bases de datos (cada instancia gestiona sus propios ficheros).
+#
+#  Requiere un Service "headless" (clusterIP: None) para dar nombre estable a
+#  cada Pod: mariadb-0.mariadb, mariadb-1.mariadb, ...
+#
+#  Las contraseñas se leen de un Secret (ver 08-secret.yaml). Aplica primero
+#  ese Secret, o sustituye los valueFrom por valores fijos para una prueba.
+#
+#  Aplicar:    kubectl apply -f 08-secret.yaml -f 04-statefulset.yaml
+#  Consultar:  kubectl get statefulset,pods,pvc
+# ============================================================================
+kind: Service
+apiVersion: v1
+metadata:
+  name: mariadb                   # nombre DNS interno de la base de datos
+  labels:
+    app: mariadb
+spec:
+  clusterIP: None                 # "headless": da nombre estable a cada Pod
+  selector:
+    app: mariadb
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  serviceName: mariadb            # debe apuntar al Service headless de arriba
+
+  selector:
+    matchLabels:
+      app: mariadb
+
+  template:                       # ===== PLANTILLA DE POD =====
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:11
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credenciales-bbdd
+                  key: root-password
+            - name: MARIADB_DATABASE
+              value: midb
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: credenciales-bbdd
+                  key: usuario
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credenciales-bbdd
+                  key: password
+          volumeMounts:
+            - name: datos           # nombre definido en volumeClaimTemplates
+              mountPath: /var/lib/mysql
+
+  # ===== PLANTILLA DE PETICIÓN DE VOLUMEN (una por réplica) =====
+  volumeClaimTemplates:
+    - metadata:
+        name: datos
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard  # ajustar a una StorageClass del clúster
+        resources:
+          requests:
+            storage: 2Gi

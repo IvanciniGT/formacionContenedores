@@ -1,0 +1,47 @@
+# ============================================================================
+#  NETWORKPOLICY  —  Cortafuegos a nivel de Pod (filtrado de tráfico)
+# ----------------------------------------------------------------------------
+#  Selecciona unos Pods (podSelector) y define quién puede ACCEDER a ellos
+#  (Ingress) y/o a dónde pueden CONECTAR (Egress). Aplica por Namespace.
+#  Requiere un plugin de red que las soporte (Calico, Cilium...).
+#
+#  Este fichero contiene DOS políticas (separadas por '---'):
+#   1) Permitir solo a ciertos Pods llegar a la base de datos por el puerto 3306.
+#   2) Negar TODO el tráfico entrante del Namespace (regla "deny-all" por defecto).
+#
+#  Aplicar:    kubectl apply -f 16-networkpolicy.yaml
+#  Consultar:  kubectl get networkpolicy
+# ============================================================================
+
+# --- 1) Solo los Pods con role=backend pueden acceder a la BBDD (puerto 3306) -
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: bbdd-solo-backend
+  namespace: formacion
+spec:
+  podSelector:
+    matchLabels:
+      app: mariadb              # a qué Pods se aplica la política
+  policyTypes:
+    - Ingress                   # controlamos el tráfico ENTRANTE
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: backend     # solo estos Pods pueden conectar
+      ports:
+        - port: 3306
+          protocol: TCP
+---
+# --- 2) Negar todo el tráfico entrante del Namespace (buena base de seguridad)-
+#     podSelector vacío = "todos los Pods"; sin reglas ingress = "nada entra".
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: denegar-todo-entrante
+  namespace: formacion
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress

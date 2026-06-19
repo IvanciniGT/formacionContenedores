@@ -1,0 +1,58 @@
+# ============================================================================
+#  SERVICE  —  IP fija de balanceo + nombre DNS interno para un grupo de Pods
+# ----------------------------------------------------------------------------
+#  Un Service balancea entre todos los Pods que tengan las labels de su
+#  "selector" dentro del mismo Namespace. Hay tres tipos, cada uno construido
+#  sobre el anterior. Este fichero muestra los tres (separados por '---').
+#
+#  Estimación realista en un clúster: casi todos ClusterIP, ningún NodePort,
+#  y un único LoadBalancer (el del Ingress Controller).
+#
+#  Aplicar:    kubectl apply -f 05-service.yaml
+#  Consultar:  kubectl get svc
+#              kubectl describe svc web-clusterip   (muestra los Endpoints/Pods)
+# ============================================================================
+
+# --- 1) ClusterIP : SOLO accesible DENTRO del clúster (el tipo por defecto) --
+kind: Service
+apiVersion: v1
+metadata:
+  name: web-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: web                    # Pods backend: los que tengan esta label
+  ports:
+    - port: 80                  # puerto del Service (en su ClusterIP)
+      targetPort: 80            # puerto en el contenedor
+  # Acceso interno:  curl web-clusterip:80
+---
+# --- 2) NodePort : ClusterIP + un puerto (>30000) abierto en CADA nodo -------
+kind: Service
+apiVersion: v1
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+    - port: 80                  # puerto del Service
+      targetPort: 80            # puerto en el contenedor
+      nodePort: 30080           # puerto externo en cada nodo (rango 30000-32767)
+  # Acceso externo:  curl IP_DE_CUALQUIER_NODO:30080
+---
+# --- 3) LoadBalancer : NodePort + balanceador EXTERNO gestionado automáticamente
+#     Requiere un balanceador compatible (el cloud lo aporta; on-premises: MetalLB)
+kind: Service
+apiVersion: v1
+metadata:
+  name: web-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 80
+  # Acceso externo:  curl IP_EXTERNA_ASIGNADA:80   (kubectl get svc -> EXTERNAL-IP)

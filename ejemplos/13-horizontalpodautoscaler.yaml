@@ -1,0 +1,31 @@
+# ============================================================================
+#  HORIZONTALPODAUTOSCALER (HPA)  —  Escalado automático por carga
+# ----------------------------------------------------------------------------
+#  Ajusta el número de réplicas de un Deployment/StatefulSet entre un mínimo y
+#  un máximo para mantener una métrica (aquí, % de CPU) en un objetivo.
+#
+#  DOS REQUISITOS imprescindibles:
+#   1) Un origen de métricas en el clúster (metrics-server; en OpenShift viene).
+#   2) Que los contenedores del destino tengan 'requests.cpu' definido: el
+#      porcentaje se calcula SOBRE ese request (ver 03-deployment.yaml).
+#
+#  Aplicar:    kubectl apply -f 13-horizontalpodautoscaler.yaml
+#  Equivalente imperativo:
+#      kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=50
+#  Consultar:  kubectl get hpa     (columna TARGETS: uso actual / objetivo)
+# ============================================================================
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v1
+
+metadata:
+  name: web-hpa
+
+spec:
+  scaleTargetRef:                 # a quién escala
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web                     # debe existir (ver 03-deployment.yaml)
+
+  minReplicas: 2                  # nunca baja de aquí
+  maxReplicas: 10                 # nunca sube de aquí
+  targetCPUUtilizationPercentage: 50   # objetivo: CPU media al 50% del request

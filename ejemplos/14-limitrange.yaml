@@ -1,0 +1,32 @@
+# ============================================================================
+#  LIMITRANGE  —  Cotas de recursos POR contenedor/Pod dentro de un Namespace
+# ----------------------------------------------------------------------------
+#  Lo define el ADMINISTRADOR. Fija, para cada contenedor del Namespace:
+#   - valores por defecto si el desarrollador no especifica nada, y
+#   - los mínimos y máximos que puede pedir.
+#  Así se evita que un contenedor pida demasiado (o demasiado poco).
+#
+#  Aplicar:    kubectl apply -f 14-limitrange.yaml
+#  Consultar:  kubectl describe limitrange limites-contenedor -n formacion
+# ============================================================================
+kind: LimitRange
+apiVersion: v1
+metadata:
+  name: limites-contenedor
+  namespace: formacion          # los LimitRange aplican a un Namespace concreto
+
+spec:
+  limits:
+    - type: Container
+      defaultRequest:           # request por defecto si el dev no pide nada
+        cpu: 250m
+        memory: 256Mi
+      default:                  # limit por defecto si el dev no pide nada
+        cpu: 500m
+        memory: 256Mi
+      min:                      # lo MÍNIMO que un contenedor puede solicitar
+        cpu: 100m
+        memory: 128Mi
+      max:                      # lo MÁXIMO que un contenedor puede solicitar
+        cpu: 2000m
+        memory: 2Gi

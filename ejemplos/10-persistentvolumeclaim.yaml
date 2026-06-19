@@ -1,0 +1,30 @@
+# ============================================================================
+#  PERSISTENTVOLUMECLAIM (PVC)  —  PETICIÓN de almacenamiento (rol: DESARROLLO)
+# ----------------------------------------------------------------------------
+#  El desarrollador NO sabe dónde se guardan físicamente los datos: solo pide
+#  un volumen con unas características. Kubernetes lo vincula a un PV compatible
+#  (creado a mano por el administrador, o automáticamente por un provisionador
+#  a partir de una StorageClass).
+#
+#  El PVC vive DENTRO de un Namespace (a diferencia del PV, que es global).
+#
+#  Aplicar:    kubectl apply -f 10-persistentvolumeclaim.yaml
+#  Consultar:  kubectl get pvc      (estado: Pending -> Bound al vincularse)
+# ============================================================================
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: datos-app
+
+spec:
+  # storageClassName decide el "match":
+  #  - con un valor (p.ej. "standard") -> usa esa StorageClass / provisionador.
+  #  - con "" (cadena vacía) -> empareja con un PV creado a mano (ver 11-...).
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce              # montable como lectura/escritura por UN nodo
+    # - ReadWriteMany           # por varios nodos (no todos los backends lo soportan)
+    # - ReadOnlyMany            # solo lectura, por varios nodos
+  resources:
+    requests:
+      storage: 2Gi              # capacidad solicitada

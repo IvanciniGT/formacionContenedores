@@ -1,0 +1,39 @@
+# ============================================================================
+#  INGRESS  —  Reglas de proxy reverso para exponer servicios al exterior
+# ----------------------------------------------------------------------------
+#  Un Ingress es un conjunto de REGLAS (qué dominio/ruta va a qué Service) que
+#  Kubernetes traduce a la configuración del Ingress Controller (nginx, HAProxy,
+#  Traefik...). El backend SIEMPRE es un Service de tipo ClusterIP.
+#
+#  Requiere que haya un Ingress Controller instalado en el clúster.
+#  En OpenShift, el objeto equivalente (y recomendado allí) es la Route.
+#
+#  Aplicar:    kubectl apply -f 06-ingress.yaml
+#  Consultar:  kubectl get ingress
+# ============================================================================
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: web
+  annotations:
+    # Selecciona qué Ingress Controller atiende esta regla (forma clásica).
+    kubernetes.io/ingress.class: nginx
+
+spec:
+  rules:
+    - host: www.miapp.com            # dominio por el que llegan las peticiones
+      http:
+        paths:
+          - path: /
+            pathType: Prefix          # casa todas las rutas que empiecen por "/"
+            backend:
+              service:
+                name: web-clusterip   # Service (ClusterIP) que recibe el tráfico
+                port:
+                  number: 80
+
+  # --- HTTPS opcional: el certificado se guarda en un Secret de tipo TLS ------
+  tls:
+    - hosts:
+        - www.miapp.com
+      secretName: miapp-tls           # Secret con tls.crt y tls.key

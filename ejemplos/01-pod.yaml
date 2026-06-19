@@ -1,0 +1,29 @@
+# ============================================================================
+#  POD (mínimo)  —  Unidad mínima de despliegue en Kubernetes
+# ----------------------------------------------------------------------------
+#  Un Pod es un conjunto de contenedores (aquí, uno solo) que comparten IP,
+#  escalan juntos y se despliegan en el mismo nodo.
+#
+#  IMPORTANTE: en producción NO se crean Pods sueltos (si mueren, no se
+#  recrean). Se usan a través de un Deployment / StatefulSet. Este ejemplo es
+#  didáctico, para ver el objeto Pod en su forma más simple.
+#
+#  Aplicar:    kubectl apply -f 01-pod.yaml
+#  Consultar:  kubectl get pods -o wide
+#  Logs/shell: kubectl logs nginx-pod
+#              kubectl exec -it nginx-pod -- bash
+# ============================================================================
+kind: Pod
+apiVersion: v1
+
+metadata:
+  name: nginx-pod              # identificador del Pod (único en el Namespace)
+  labels:
+    app: nginx                 # etiqueta clave: por ella lo encontrará un Service
+
+spec:
+  containers:
+    - name: nginx              # nombre del contenedor dentro del Pod
+      image: nginx:1.27        # imagen con TAG FIJO (nunca latest)
+      ports:
+        - containerPort: 80    # puerto que abre el proceso (informativo)

@@ -1,0 +1,61 @@
+# ============================================================================
+#  POD MULTICONTENEDOR  —  initContainers + sidecar + volumen compartido
+# ----------------------------------------------------------------------------
+#  Muestra los tres tipos de pieza que puede tener un Pod:
+#   - initContainers : se ejecutan SECUENCIALMENTE y DEBEN TERMINAR antes de
+#                      que arranquen los containers. Preparan el terreno.
+#   - containers     : arrancan EN PARALELO y deben ejecutarse de forma
+#                      continua (24x7). El segundo es un SIDECAR del primero.
+#   - volumes        : se definen a nivel de Pod; cada contenedor decide en qué
+#                      ruta montarlos. Aquí un emptyDir compartido.
+#
+#  Aplicar:   kubectl apply -f 02-pod-multicontenedor.yaml
+#  Ver logs de un contenedor concreto:
+#             kubectl logs advanced-pod -c sidecar-lector
+# ============================================================================
+kind: Pod
+apiVersion: v1
+
+metadata:
+  name: advanced-pod
+  labels:
+    app: avanzado
+
+spec:
+  # --- initContainers: preparan el volumen antes de que arranque nginx -------
+  initContainers:
+    - name: preparador
+      image: busybox:1.36
+      # Escribe un fichero inicial en el volumen compartido y termina.
+      command: ["sh", "-c", "echo 'preparado por el initContainer' > /datos/inicio.txt"]
+      volumeMounts:
+        - name: compartido
+          mountPath: /datos
+
+  # --- containers: corren en paralelo, de forma continua ---------------------
+  containers:
+    - name: nginx                 # contenedor principal
+      image: nginx:1.27
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: compartido
+          mountPath: /usr/share/nginx/html   # sirve lo que haya en el volumen
+
+    - name: sidecar-lector        # contenedor SIDECAR (acompaña al principal)
+      image: busybox:1.36
+      # Ejemplo de sidecar: vigila el volumen compartido de forma continua.
+      command: ["sh", "-c", "while true; do ls -l /datos; sleep 30; done"]
+      env:                        # variables de entorno propias del contenedor
+        - name: ROL
+          value: lector
+      volumeMounts:
+        - name: compartido
+          mountPath: /datos
+
+  # --- volumes: definidos a nivel de Pod -------------------------------------
+  volumes:
+    - name: compartido
+      emptyDir: {}                # carpeta vacía que vive y muere con el Pod
+                                  # (no persistente; ideal para compartir datos
+                                  #  entre contenedores del mismo Pod)

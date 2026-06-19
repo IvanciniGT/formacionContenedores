@@ -1,0 +1,63 @@
+# ============================================================================
+#  AFINIDADES  —  Influir en el nodo donde el scheduler coloca los Pods
+# ----------------------------------------------------------------------------
+#  Tres mecanismos, de menos a más expresivo:
+#   - nodeSelector  : el Pod solo va a nodos con una etiqueta concreta.
+#   - nodeAffinity  : versión rica, con operadores y reglas obligatorias/preferentes.
+#   - podAntiAffinity : separar réplicas entre sí (la regla MÁS usada, para HA).
+#
+#  Para que el nodeSelector/nodeAffinity funcionen, etiqueta antes los nodos:
+#     kubectl label node <NODO> disco=ssd
+#     kubectl label node <NODO> zona=europa
+#
+#  Aplicar:    kubectl apply -f 17-afinidades.yaml
+#  Comprobar:  kubectl get pods -o wide   (en qué nodo cae cada réplica)
+# ============================================================================
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: web-afinidad
+  labels:
+    app: web-afinidad
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-afinidad
+  template:
+    metadata:
+      labels:
+        app: web-afinidad
+    spec:
+      # --- 1) nodeSelector: forma simple (descomentar para usarla) -----------
+      # nodeSelector:
+      #   disco: ssd
+
+      affinity:
+        # --- 2) nodeAffinity: solo nodos de la zona "europa" (obligatorio) ----
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: zona
+                    operator: In         # In, NotIn, Exists, DoesNotExist, Gt, Lt
+                    values:
+                      - europa
+
+        # --- 3) podAntiAffinity: repartir las réplicas en nodos distintos -----
+        #     "preferred" (preferente): si no hay nodos de sobra, igual se
+        #     despliegan; con "required" (obligatorio) podrían quedar Pending.
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: web-afinidad    # "lejos de otras réplicas de esta app"
+                topologyKey: kubernetes.io/hostname   # unidad de reparto: el nodo
+
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          ports:
+            - containerPort: 80

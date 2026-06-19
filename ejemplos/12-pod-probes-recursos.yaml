@@ -1,0 +1,55 @@
+# ============================================================================
+#  PROBES Y RECURSOS  —  Configurar un contenedor para la fiabilidad
+# ----------------------------------------------------------------------------
+#  Reúne en un solo contenedor los tres mecanismos de fiabilidad a nivel de Pod:
+#   - resources : mínimos garantizados (requests) y máximos (limits).
+#   - startupProbe / livenessProbe / readinessProbe : las tres sondas de salud.
+#
+#  Recordatorio de qué hace Kubernetes ante cada fallo:
+#   - startup  falla -> sigue esperando; si nunca arranca, mata y recrea.
+#   - liveness falla -> mata y recrea el contenedor.
+#   - readiness falla -> lo SACA del Service (balanceador); NO lo mata.
+#
+#  Aplicar:    kubectl apply -f 12-pod-probes-recursos.yaml
+#  Observar:   kubectl describe pod web-fiable   (sección Conditions / Events)
+# ============================================================================
+kind: Pod
+apiVersion: v1
+metadata:
+  name: web-fiable
+  labels:
+    app: web
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27
+      ports:
+        - containerPort: 80
+
+      resources:
+        requests:                 # mínimos GARANTIZADOS (necesarios para el HPA)
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 128Mi           # regla: igual que el request de memoria
+
+      startupProbe:               # ¿ha ARRANCADO? protege a apps de arranque lento
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 12      # da hasta 12x5 = 60s para arrancar
+
+      livenessProbe:              # ¿sigue VIVO?
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 3
+
+      readinessProbe:             # ¿LISTO para recibir tráfico?
+        httpGet:
+          path: /
+          port: 80
+        periodSeconds: 5
+        failureThreshold: 3

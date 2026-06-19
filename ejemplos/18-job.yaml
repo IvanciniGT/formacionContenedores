@@ -1,0 +1,26 @@
+# ============================================================================
+#  JOB  —  Tarea que se ejecuta y TERMINA (no es un servicio 24x7)
+# ----------------------------------------------------------------------------
+#  Para scripts/comandos puntuales: un backup, una migración, un cálculo.
+#  A diferencia de un Pod normal, sus contenedores DEBEN terminar.
+#  'restartPolicy' solo admite OnFailure o Never en un Job.
+#
+#  Aplicar:    kubectl apply -f 18-job.yaml
+#  Consultar:  kubectl get jobs
+#              kubectl logs job/tarea-ejemplo
+# ============================================================================
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: tarea-ejemplo
+
+spec:
+  completions: 1                # cuántas ejecuciones con éxito se requieren
+  backoffLimit: 4              # reintentos antes de dar el Job por fallido
+  template:                     # ===== PLANTILLA DE POD =====
+    spec:
+      restartPolicy: Never      # en Jobs: Never u OnFailure (nunca Always)
+      containers:
+        - name: tarea
+          image: busybox:1.36
+          command: ["sh", "-c", "echo 'Iniciando tarea...'; sleep 5; echo 'Tarea completada'"]

@@ -1,0 +1,28 @@
+# ============================================================================
+#  RESOURCEQUOTA  —  Techo TOTAL de recursos de un Namespace
+# ----------------------------------------------------------------------------
+#  Lo define el ADMINISTRADOR. Limita la suma agregada de todo el Namespace:
+#  CPU, memoria y número de objetos de cada tipo. Si una creación superaría la
+#  cuota, Kubernetes la RECHAZA.
+#
+#  Nota: si hay ResourceQuota de cpu/memory, todos los Pods DEBEN declarar sus
+#  requests/limits (un LimitRange con valores por defecto ayuda a cumplirlo).
+#
+#  Aplicar:    kubectl apply -f 15-resourcequota.yaml
+#  Consultar:  kubectl describe resourcequota cuota-namespace -n formacion
+# ============================================================================
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: cuota-namespace
+  namespace: formacion
+
+spec:
+  hard:
+    requests.cpu: "4"               # suma de requests de CPU
+    requests.memory: 8Gi            # suma de requests de memoria
+    limits.cpu: "8"                 # suma de limits de CPU
+    limits.memory: 8Gi              # suma de limits de memoria
+    pods: "20"                      # nº máximo de Pods
+    services: "10"                  # nº máximo de Services
+    persistentvolumeclaims: "10"    # nº máximo de PVCs

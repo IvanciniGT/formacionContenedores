@@ -1,0 +1,69 @@
+# ============================================================================
+#  DEPLOYMENT  —  Plantilla de Pod + nº de réplicas (workload sin estado)
+# ----------------------------------------------------------------------------
+#  Garantiza que SIEMPRE haya N Pods en marcha a partir de una plantilla.
+#  Caso típico: servidores web. Incluye lo que se espera en producción:
+#   - strategy   : cómo se actualiza (RollingUpdate, sin cortes de servicio)
+#   - resources  : mínimos garantizados (requests) y máximos (limits)
+#   - probes     : sondas de vivacidad (liveness) y de disponibilidad (readiness)
+#
+#  CLAVE: el Deployment encuentra "sus" Pods por LABEL. El selector.matchLabels
+#  DEBE coincidir con template.metadata.labels.
+#
+#  Aplicar:    kubectl apply -f 03-deployment.yaml
+#  Escalar:    kubectl scale deployment web --replicas=5
+#  Actualizar: kubectl set image deployment/web nginx=nginx:1.27
+#  Rollout:    kubectl rollout status deployment/web
+#              kubectl rollout undo   deployment/web
+# ============================================================================
+kind: Deployment
+apiVersion: apps/v1               # los objetos de workload usan el grupo "apps"
+
+metadata:
+  name: web
+  labels:
+    app: web
+
+spec:
+  replicas: 3                     # número de Pods que se mantienen en marcha
+
+  selector:
+    matchLabels:
+      app: web                    # <── el Deployment gestiona los Pods con esta label
+
+  strategy:
+    type: RollingUpdate           # actualización gradual (alternativa: Recreate)
+    rollingUpdate:
+      maxUnavailable: 0           # nunca bajar del nº de réplicas deseado
+      maxSurge: 1                 # permitir 1 Pod extra temporal durante el cambio
+
+  template:                       # ===== PLANTILLA DE POD =====
+    metadata:
+      labels:
+        app: web                  # <── debe COINCIDIR con selector.matchLabels
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+          resources:
+            requests:             # mínimos GARANTIZADOS (los usa el scheduler)
+              cpu: 100m
+              memory: 128Mi
+            limits:               # máximos permitidos
+              # cpu: se deja sin fijar (la CPU es "comprimible")
+              memory: 128Mi       # regla: limits.memory == requests.memory
+          livenessProbe:          # ¿sigue vivo? si falla -> reinicia el contenedor
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:         # ¿listo para tráfico? si falla -> fuera del Service
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5

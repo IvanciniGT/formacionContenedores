@@ -1,0 +1,32 @@
+# ============================================================================
+#  CONFIGMAP  —  Datos de configuración (no sensibles) en la BBDD del clúster
+# ----------------------------------------------------------------------------
+#  Guarda pares clave-valor y/o ficheros completos. Se consumen desde los Pods
+#  como variables de entorno o montados como ficheros (ver 09-...).
+#
+#  Aplicar:    kubectl apply -f 07-configmap.yaml
+#  Consultar:  kubectl get configmap
+#              kubectl describe configmap configuracion-app
+# ============================================================================
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: configuracion-app
+
+data:
+  # --- Pares clave-valor simples (típicos para variables de entorno) ---------
+  APP_COLOR: azul
+  APP_MODE: produccion
+  DB_HOST: mariadb                 # nombre del Service de la base de datos
+
+  # --- Un fichero completo (típico para montarlo como volumen) ---------------
+  #     El '|' conserva los saltos de línea internos del bloque de texto.
+  default.conf: |
+    server {
+      listen 80;
+      server_name localhost;
+      location / {
+        root  /usr/share/nginx/html;
+        index index.html;
+      }
+    }

@@ -1,0 +1,34 @@
+# ============================================================================
+#  ROUTE (OpenShift)  —  Exposición externa de un Service
+# ----------------------------------------------------------------------------
+#  EXCLUSIVO DE OPENSHIFT (no existe en Kubernetes puro).
+#  Es el equivalente a un Ingress, pero además gestiona el nombre DNS externo
+#  y la terminación TLS de forma sencilla. El tráfico entra por el "Router" de
+#  OpenShift (un Ingress Controller basado en HAProxy).
+#
+#  Aplicar:    oc apply -f 20-route-openshift.yaml
+#  Consultar:  oc get route        (columna HOST/PORT da la URL pública)
+#  Crear rápido desde un Service:   oc expose service/web-clusterip
+# ============================================================================
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: web
+
+spec:
+  # host: si se omite, OpenShift genera uno automáticamente
+  #   (p.ej. web-formacion.apps.<dominio-del-cluster>).
+  host: web.apps.midominio.com
+
+  to:
+    kind: Service
+    name: web-clusterip            # Service (ClusterIP) que se expone
+
+  port:
+    targetPort: 80                 # puerto del Service al que enrutar
+
+  tls:
+    termination: edge              # HTTPS terminado en el Router
+    # termination: passthrough     # el TLS llega cifrado hasta el Pod
+    # termination: reencrypt       # el Router descifra y vuelve a cifrar al Pod
+    insecureEdgeTerminationPolicy: Redirect   # redirige http -> https

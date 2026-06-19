@@ -1,0 +1,29 @@
+# ============================================================================
+#  PERSISTENTVOLUME (PV)  —  REFERENCIA a un almacenamiento real (rol: SISTEMAS)
+# ----------------------------------------------------------------------------
+#  El PV NO crea el almacenamiento: lo REFERENCIA (ya debe existir). Es un
+#  objeto GLOBAL (no pertenece a ningún Namespace). Lo crea el administrador.
+#
+#  Este ejemplo usa hostPath (una carpeta del propio nodo). ATENCIÓN: hostPath
+#  vale SOLO para laboratorio/un único nodo; en producción se usan volúmenes
+#  externos (NFS, iSCSI, cabinas, discos de cloud) y, normalmente, NO se crean
+#  PV a mano, sino que un provisionador los genera desde una StorageClass.
+#
+#  Aplicar:    kubectl apply -f 11-persistentvolume.yaml
+#  Consultar:  kubectl get pv     (estado: Available -> Bound al vincularse)
+# ============================================================================
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-datos-app
+
+spec:
+  storageClassName: ""          # "" empareja con el PVC de 10-... (sin StorageClass)
+  capacity:
+    storage: 2Gi                # capacidad ofrecida (debe cubrir la del PVC)
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain   # al liberar el PVC, conservar los datos
+  hostPath:                     # TIPO de volumen (solo laboratorio/un nodo)
+    path: /datos/app
+    type: DirectoryOrCreate     # crea la carpeta si no existe

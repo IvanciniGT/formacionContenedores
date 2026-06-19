@@ -1,0 +1,39 @@
+# ============================================================================
+#  CRONJOB  —  Plantilla de Job + una programación temporal (cron)
+# ----------------------------------------------------------------------------
+#  Crea Jobs automáticamente según un calendario. Es lo que se usa en la
+#  práctica para tareas recurrentes (backups nocturnos, limpiezas...).
+#
+#  Formato del campo 'schedule' (cron):
+#     ┌ minuto (0-59)
+#     │ ┌ hora (0-23)
+#     │ │ ┌ día del mes (1-31)
+#     │ │ │ ┌ mes (1-12)
+#     │ │ │ │ ┌ día de la semana (0-6, domingo=0)
+#     * * * * *
+#  Ejemplos:  "*/5 * * * *" (cada 5 min)   "0 2 * * *" (todos los días a las 2:00)
+#
+#  Aplicar:    kubectl apply -f 19-cronjob.yaml
+#  Consultar:  kubectl get cronjob
+#              kubectl get jobs          (las ejecuciones generadas)
+# ============================================================================
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: backup-nocturno
+
+spec:
+  schedule: "0 2 * * *"             # todos los días a las 02:00
+  concurrencyPolicy: Forbid         # no solapar ejecuciones si una se alarga
+  successfulJobsHistoryLimit: 3     # cuántos Jobs con éxito conservar
+  failedJobsHistoryLimit: 1         # cuántos Jobs fallidos conservar
+
+  jobTemplate:                      # ===== PLANTILLA DE JOB =====
+    spec:
+      template:                     # ===== PLANTILLA DE POD =====
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: busybox:1.36
+              command: ["sh", "-c", "echo 'Backup de la BBDD ejecutado el' $(date)"]
